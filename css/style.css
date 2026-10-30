@@ -1,0 +1,141 @@
+/* Susun atur: satu lajur "laluan misi" — avatar berjalan merentas 4 hentian di atas, kad bergambar besar di bawah */
+:root {
+  --bg: #EAF4F8;
+  --surface: #FFFFFF;
+  --ink: #17324A;
+  --muted: #557086;
+  --line: #CFE0EA;
+  --accent: #FF7A45;
+  --accent-ink: #FFFFFF;
+  --tile: #FFF3E8;
+  --picked: #1F9D74;
+  --picked-soft: #DDF5EC;
+  --warn-soft: #FFF1CC;
+  --R: #E0603A; --I: #2C7FB8; --A: #B24A8E; --S: #2FA36B; --E: #D69410; --C: #6E5BD6;
+  --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0E1C28; --surface: #16293A; --ink: #E8F1F7; --muted: #9BB3C4; --line: #274256;
+    --accent: #FF8A5B; --accent-ink: #1A0E08; --tile: #22384A; --picked: #3CC495; --picked-soft: #173A31;
+    --warn-soft: #3A3218;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px }
+h1, h2, h3 { font-family: var(--display); font-weight: 800; line-height: 1.1; margin: 0; text-wrap: balance }
+h1 { font-size: clamp(30px, 6vw, 44px) }
+h2 { font-size: clamp(24px, 5vw, 32px) }
+p { margin: 0 }
+button { font: inherit; color: inherit; cursor: pointer }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px }
+
+/* laluan misi */
+.path { position: relative; height: 64px; margin-inline: 14px }
+.path::before { content: ""; position: absolute; left: 0; right: 0; top: 44px; height: 6px; border-radius: 3px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 14px, transparent 14px 22px) }
+.path .fill { position: absolute; left: 0; top: 44px; height: 6px; border-radius: 3px; background: var(--accent); transition: width .6s ease }
+.stop { position: absolute; top: 36px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%;
+  background: var(--surface); border: 4px solid var(--line); transition: border-color .4s }
+.stop.on { border-color: var(--accent) }
+.avatar { position: absolute; top: 0; font-size: 34px; margin-left: -20px; line-height: 1; transition: left .7s cubic-bezier(.5, 1.6, .5, 1) }
+.avatar.walk { animation: hop .35s ease-in-out 2 }
+@keyframes hop { 50% { transform: translateY(-10px) } }
+
+.stagehead { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.speak { display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--line); background: var(--surface);
+  border-radius: 999px; padding: 8px 16px; font-weight: 700 }
+.speak:hover { border-color: var(--accent) }
+
+/* kad */
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px }
+@media (max-width: 560px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.cardwrap { position: relative }
+.card { position: relative; width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 12px; text-align: center;
+  background: var(--surface); border: 3px solid var(--line); border-radius: 22px; transition: transform .15s, border-color .2s, background .2s }
+.card:hover { transform: translateY(-3px) }
+.card .pic { aspect-ratio: 1; max-width: 100%; border-radius: 16px; background: var(--tile);
+  display: grid; place-items: center; font-size: clamp(46px, 11vw, 68px); line-height: 1 }
+.card .lbl { font-weight: 700; font-size: 17px; line-height: 1.25; min-height: 2.5em; display: grid; place-items: center; text-wrap: balance }
+.card .no { font-size: 12px; color: var(--muted); letter-spacing: .04em; font-variant-numeric: tabular-nums; margin-top: -4px }
+.mini { position: absolute; top: 18px; right: 18px; width: 36px; height: 36px; border-radius: 50%;
+  border: 0; background: var(--surface); font-size: 17px; display: grid; place-items: center; box-shadow: 0 1px 4px rgb(0 0 0 / .18) }
+.card .tick { position: absolute; top: 18px; left: 18px; width: 38px; height: 38px; border-radius: 50%;
+  background: var(--picked); color: #fff; font-size: 22px; font-weight: 800; display: grid; place-items: center;
+  transform: scale(0); transition: transform .25s cubic-bezier(.5, 1.8, .5, 1) }
+.card[aria-pressed="true"] { border-color: var(--picked); background: var(--picked-soft) }
+.card[aria-pressed="true"] .tick { transform: scale(1) }
+.card[aria-pressed="true"] .pic { animation: pop .35s ease }
+@keyframes pop { 40% { transform: scale(1.08) rotate(-3deg) } }
+
+.bar { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap }
+.count { color: var(--muted) }
+.go { border: 0; background: var(--accent); color: var(--accent-ink); font-family: var(--display); font-weight: 800;
+  font-size: 22px; padding: 12px 30px; border-radius: 999px; box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 60%, #000) }
+.go:active { transform: translateY(3px); box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 60%, #000) }
+.ghost { border: 2px solid var(--line); background: transparent; border-radius: 999px; padding: 10px 20px; font-weight: 700 }
+
+/* skrin mula */
+.hero { display: flex; flex-direction: column; gap: 16px; padding: 24px; background: var(--surface); border-radius: 26px; border: 3px solid var(--line) }
+.hero .big { font-size: 64px; line-height: 1 }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
+@media (max-width: 560px) { .steps { grid-template-columns: 1fr } }
+.steps div { background: var(--tile); border-radius: 16px; padding: 12px; display: flex; gap: 10px; align-items: center; font-weight: 700 }
+.steps span { font-size: 30px }
+.who { display: flex; flex-direction: column; gap: 6px }
+.who label { font-weight: 700 }
+.who input { font: inherit; color: var(--ink); background: var(--bg); border: 3px solid var(--line); border-radius: 14px;
+  padding: 10px 14px; width: 100%; max-width: 420px }
+.who input:focus { outline: none; border-color: var(--accent) }
+.who .bar { margin-top: 10px }
+.err { color: var(--R); font-weight: 700 }
+.note { font-size: 14px; color: var(--muted); max-width: 65ch }
+
+/* kad keputusan (untuk tangkap layar) */
+.scorecard { background: var(--surface); border: 3px solid var(--ink); border-radius: 24px; padding: 18px;
+  display: flex; flex-direction: column; gap: 14px }
+.sc-name { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 2px dashed var(--line) }
+.sc-name b { font-family: var(--display); font-size: 24px; line-height: 1.1; min-width: 0; overflow-wrap: anywhere }
+.sc-name span { background: var(--tile); border-radius: 999px; padding: 2px 12px; font-weight: 700; font-size: 15px }
+.sc-top { display: flex; gap: 18px; justify-content: space-between; align-items: flex-end; flex-wrap: wrap }
+.codebox { display: flex; gap: 8px; margin-top: 6px }
+.letter { width: 68px; height: 80px; border-radius: 16px; display: grid; place-items: center; color: #fff;
+  font-family: var(--display); font-weight: 800; font-size: 48px; animation: drop .5s cubic-bezier(.5, 1.6, .5, 1) both }
+.letter:nth-child(2) { animation-delay: .15s }
+.letter:nth-child(3) { animation-delay: .3s }
+@keyframes drop { from { transform: translateY(-30px) scale(.6); opacity: 0 } }
+.facts { margin: 0; display: flex; gap: 18px }
+.facts dt { font-size: 13px; color: var(--muted); font-weight: 700 }
+.facts dd { margin: 0; font-family: var(--display); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums }
+.facts small { font-family: var(--body); font-size: 13px; font-weight: 700; color: var(--muted) }
+.tie { background: var(--warn-soft); border-radius: 12px; padding: 10px 12px; font-weight: 700 }
+.shot, .send { text-align: center; font-weight: 700; color: var(--muted) }
+.send.ok { color: var(--picked) }
+.send.fail { color: var(--ink); background: var(--warn-soft); border-radius: 12px; padding: 10px 12px }
+.ghost.small { padding: 4px 14px; margin-left: 6px; border-color: var(--ink) }
+.bars { display: flex; flex-direction: column; gap: 8px }
+.brow { display: grid; grid-template-columns: 140px minmax(0, 1fr) 48px; gap: 10px; align-items: center }
+@media (max-width: 420px) { .brow { grid-template-columns: 110px minmax(0, 1fr) 44px; font-size: 15px } }
+.brow .track { height: 18px; border-radius: 9px; background: var(--line); overflow: hidden }
+.brow .val { height: 100%; border-radius: 9px; transition: width .8s ease }
+.brow b { font-variant-numeric: tabular-nums; text-align: right }
+.types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 560px) { .types { grid-template-columns: 1fr } }
+.type { background: var(--surface); border-radius: 18px; padding: 14px; border-top: 6px solid; display: flex; flex-direction: column; gap: 6px }
+.type h3 { font-size: 22px }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chips span { background: var(--tile); border-radius: 999px; padding: 3px 10px; font-size: 14px }
+.panel { background: var(--surface); border-radius: 22px; padding: 18px; border: 3px solid var(--line) }
+
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important } }
