@@ -1,141 +1,205 @@
-/* Susun atur: satu lajur "laluan misi" — avatar berjalan merentas 4 hentian di atas, kad bergambar besar di bawah */
+/* Gaya neobrutalism cerah dan ceria: garisan tebal, bayang keras tanpa kabur, warna terang, dan animasi kecil yang melantun.
+   Sentiasa mod cerah, walaupun peranti dalam mod gelap.
+   Susun atur: satu lajur "laluan misi", avatar berjalan merentas 4 hentian di atas, kad bergambar besar di bawah. */
 :root {
-  --bg: #EAF4F8;
+  --bg: #FFE98F;
+  --dot: #F5CF52;
   --surface: #FFFFFF;
-  --ink: #17324A;
-  --muted: #557086;
-  --line: #CFE0EA;
-  --accent: #FF7A45;
-  --accent-ink: #FFFFFF;
-  --tile: #FFF3E8;
-  --picked: #1F9D74;
-  --picked-soft: #DDF5EC;
-  --warn-soft: #FFF1CC;
-  --R: #E0603A; --I: #2C7FB8; --A: #B24A8E; --S: #2FA36B; --E: #D69410; --C: #6E5BD6;
-  --display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --ink: #111111;
+  --muted: #4B4B57;
+  --edge: #111111;   /* warna garisan sempadan */
+  --shade: #111111;  /* warna bayang keras */
+  --on-color: #111111; /* teks di atas warna terang, sama dalam mod gelap */
+  --accent: #FFD23F;
+  --pink: #FF7EB6; --blue: #5AA9FF; --green: #3DDC97; --purple: #B49BFF; --orange: #FF9F45;
+  --tile: #FFFBEF;
+  --picked: #3DDC97;
+  --picked-soft: #D9FBEA;
+  --warn-soft: #FFE98A;
+  --R: #FF6B4A; --I: #5AA9FF; --A: #FF7EB6; --S: #3DDC97; --E: #FFC23D; --C: #B49BFF;
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
   --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --b: 3px solid var(--edge);
+  --s: 5px 5px 0 var(--shade);
+  --s-big: 8px 8px 0 var(--shade);
+  --bounce: cubic-bezier(.34, 1.8, .5, 1);
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0E1C28; --surface: #16293A; --ink: #E8F1F7; --muted: #9BB3C4; --line: #274256;
-    --accent: #FF8A5B; --accent-ink: #1A0E08; --tile: #22384A; --picked: #3CC495; --picked-soft: #173A31;
-    --warn-soft: #3A3218;
-    color-scheme: dark;
-  }
-}
-
 * { box-sizing: border-box }
 html, body { margin: 0 }
 body {
-  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.5;
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--dot) 1.6px, transparent 1.6px);
+  background-size: 22px 22px;
+  color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 20px 40px;
+  padding-block: 20px 48px;
+  overflow-x: hidden;
 }
-.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px }
-h1, h2, h3 { font-family: var(--display); font-weight: 800; line-height: 1.1; margin: 0; text-wrap: balance }
-h1 { font-size: clamp(30px, 6vw, 44px) }
-h2 { font-size: clamp(24px, 5vw, 32px) }
+/* hiasan latar: bulatan pink dan bintang biru yang terapung */
+body::before, body::after { content: ""; position: fixed; z-index: -1; border: var(--b); pointer-events: none }
+body::before { width: 180px; height: 180px; border-radius: 50%; background: var(--pink); top: -60px; left: -70px;
+  animation: float 7s ease-in-out infinite }
+body::after { width: 150px; height: 150px; background: var(--blue); bottom: -40px; right: -40px; border-radius: 30px;
+  animation: float 9s ease-in-out infinite reverse }
+@media (max-width: 560px) { body::before { width: 120px; height: 120px } body::after { width: 100px; height: 100px } }
+.wrap { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px }
+h1, h2, h3 { font-family: var(--display); font-weight: 800; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -.02em }
+h1 { font-size: clamp(40px, 9vw, 64px) }
+h2 { font-size: clamp(28px, 6vw, 38px) }
 p { margin: 0 }
+mark { background: var(--pink); color: var(--on-color); padding: 0 .18em; border: var(--b); border-radius: 10px;
+  box-shadow: 4px 4px 0 var(--shade); display: inline-block; transform: rotate(-2deg) }
 button { font: inherit; color: inherit; cursor: pointer }
-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px }
+button:focus-visible, input:focus-visible { outline: 3px dashed var(--ink); outline-offset: 4px }
+
+/* butang tekan: naik bila hover, tenggelam ke dalam bayang bila ditekan */
+.speak, .ghost, .go, .mini, .card { transition: transform .12s ease, box-shadow .12s ease, background .2s }
+.speak:hover, .ghost:hover, .go:hover, .mini:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--shade) }
+.speak:active, .ghost:active, .go:active, .mini:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--shade) }
 
 /* laluan misi */
-.path { position: relative; height: 64px; margin-inline: 14px }
-.path::before { content: ""; position: absolute; left: 0; right: 0; top: 44px; height: 6px; border-radius: 3px;
-  background: repeating-linear-gradient(90deg, var(--line) 0 14px, transparent 14px 22px) }
-.path .fill { position: absolute; left: 0; top: 44px; height: 6px; border-radius: 3px; background: var(--accent); transition: width .6s ease }
-.stop { position: absolute; top: 36px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%;
-  background: var(--surface); border: 4px solid var(--line); transition: border-color .4s }
-.stop.on { border-color: var(--accent) }
-.avatar { position: absolute; top: 0; font-size: 34px; margin-left: -20px; line-height: 1; transition: left .7s cubic-bezier(.5, 1.6, .5, 1) }
-.avatar.walk { animation: hop .35s ease-in-out 2 }
-@keyframes hop { 50% { transform: translateY(-10px) } }
+.path { position: relative; height: 74px; margin-inline: 18px }
+.path::before { content: ""; position: absolute; left: -18px; right: -18px; top: 44px; height: 16px; border: var(--b);
+  border-radius: 999px; background: var(--surface); box-shadow: 3px 3px 0 var(--shade) }
+.path .fill { position: absolute; left: -15px; top: 47px; height: 10px; border-radius: 999px; transition: width .7s var(--bounce);
+  background: repeating-linear-gradient(-45deg, var(--accent) 0 10px, var(--orange) 10px 20px); background-size: 28px 28px;
+  animation: stripes 1s linear infinite }
+@keyframes stripes { to { background-position: 28px 0 } }
+.stop { position: absolute; top: 40px; width: 24px; height: 24px; margin-left: -12px; border: var(--b); border-radius: 7px;
+  background: var(--surface); transform: rotate(45deg); transition: background .3s }
+.stop.on { background: var(--pink) }
+.avatar { position: absolute; top: -2px; font-size: 38px; margin-left: -22px; line-height: 1; transition: left .8s var(--bounce);
+  animation: bob 1.6s ease-in-out infinite }
+.avatar.walk { animation: hop .35s ease-in-out 2, bob 1.6s ease-in-out .7s infinite }
+@keyframes hop { 50% { transform: translateY(-14px) rotate(-8deg) } }
+@keyframes bob { 50% { transform: translateY(-5px) } }
 
-.stagehead { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap }
-.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
-.speak { display: inline-flex; align-items: center; gap: 8px; border: 2px solid var(--line); background: var(--surface);
-  border-radius: 999px; padding: 8px 16px; font-weight: 700 }
-.speak:hover { border-color: var(--accent) }
+.stagehead { display: flex; gap: 14px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap }
+.eyebrow { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--on-color); background: var(--accent); border: 2px solid var(--edge); border-radius: 8px; padding: 2px 10px; margin-bottom: 8px }
+.speak { display: inline-flex; align-items: center; gap: 8px; border: var(--b); background: var(--blue); color: var(--on-color);
+  border-radius: 999px; padding: 8px 16px; font-weight: 700; box-shadow: 4px 4px 0 var(--shade) }
 
 /* kad */
-.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px }
-@media (max-width: 560px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
-.cardwrap { position: relative }
-.card { position: relative; width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 12px; text-align: center;
-  background: var(--surface); border: 3px solid var(--line); border-radius: 22px; transition: transform .15s, border-color .2s, background .2s }
-.card:hover { transform: translateY(-3px) }
-.card .pic { aspect-ratio: 1; max-width: 100%; border-radius: 16px; background: var(--tile);
-  display: grid; place-items: center; font-size: clamp(46px, 11vw, 68px); line-height: 1 }
-.card .lbl { font-weight: 700; font-size: 17px; line-height: 1.25; min-height: 2.5em; display: grid; place-items: center; text-wrap: balance }
-.card .no { font-size: 12px; color: var(--muted); letter-spacing: .04em; font-variant-numeric: tabular-nums; margin-top: -4px }
-.mini { position: absolute; top: 18px; right: 18px; width: 36px; height: 36px; border-radius: 50%;
-  border: 0; background: var(--surface); font-size: 17px; display: grid; place-items: center; box-shadow: 0 1px 4px rgb(0 0 0 / .18) }
-.card .tick { position: absolute; top: 18px; left: 18px; width: 38px; height: 38px; border-radius: 50%;
-  background: var(--picked); color: #fff; font-size: 22px; font-weight: 800; display: grid; place-items: center;
-  transform: scale(0); transition: transform .25s cubic-bezier(.5, 1.8, .5, 1) }
-.card[aria-pressed="true"] { border-color: var(--picked); background: var(--picked-soft) }
-.card[aria-pressed="true"] .tick { transform: scale(1) }
-.card[aria-pressed="true"] .pic { animation: pop .35s ease }
-@keyframes pop { 40% { transform: scale(1.08) rotate(-3deg) } }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px }
+@media (max-width: 560px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px } }
+.cardwrap { position: relative; animation: popin .45s var(--bounce) both; animation-delay: calc(var(--i, 0) * 45ms) }
+@keyframes popin { from { opacity: 0; transform: translateY(18px) scale(.85) rotate(-3deg) } }
+.card { position: relative; width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 10px; text-align: center;
+  background: var(--surface); border: var(--b); border-radius: 18px; box-shadow: var(--s) }
+.cardwrap:nth-child(4n+2) .card { background: #FFE3F0 }
+.cardwrap:nth-child(4n+3) .card { background: #E1F0FF }
+.cardwrap:nth-child(4n+4) .card { background: #EEE6FF }
+.card:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--shade) }
+.card:hover .pic svg { animation: wiggle .5s ease }
+.card:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--shade) }
+@keyframes wiggle { 30% { transform: rotate(-4deg) scale(1.04) } 65% { transform: rotate(3deg) scale(1.04) } }
+.card .pic { aspect-ratio: 1; max-width: 100%; border-radius: 12px; background: var(--tile); border: var(--b);
+  display: grid; place-items: center; font-size: clamp(46px, 11vw, 68px); line-height: 1; overflow: hidden }
+.card .pic svg { display: block; width: 100%; height: 100% }
+.card .lbl { font-weight: 700; font-size: 16px; line-height: 1.25; min-height: 2.5em; display: grid; place-items: center; text-wrap: balance }
+.card .no { font-size: 12px; color: var(--muted); letter-spacing: .04em; font-variant-numeric: tabular-nums; margin-top: -6px }
+.mini { position: absolute; top: -8px; right: -8px; width: 38px; height: 38px; border-radius: 12px; z-index: 1;
+  border: var(--b); background: var(--accent); color: var(--on-color); font-size: 16px; display: grid; place-items: center;
+  box-shadow: 3px 3px 0 var(--shade) }
+.card .tick { position: absolute; top: 4px; left: 4px; width: 42px; height: 42px; border-radius: 50%; z-index: 1;
+  background: var(--picked); color: var(--on-color); border: var(--b); font-size: 22px; font-weight: 800; display: grid; place-items: center;
+  transform: scale(0) rotate(-90deg); transition: transform .35s var(--bounce) }
+.cardwrap .card[aria-pressed="true"] { background: var(--picked-soft); transform: rotate(-1.5deg); box-shadow: 6px 6px 0 var(--picked), 6px 6px 0 3px var(--shade) }
+.cardwrap:nth-child(even) .card[aria-pressed="true"] { transform: rotate(1.5deg) }
+.card[aria-pressed="true"] .tick { transform: scale(1) rotate(0) }
+.card[aria-pressed="true"] .pic { animation: pop .45s var(--bounce) }
+@keyframes pop { 35% { transform: scale(1.1) rotate(-4deg) } 70% { transform: scale(.97) rotate(2deg) } }
 
 .bar { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap }
-.count { color: var(--muted) }
-.go { border: 0; background: var(--accent); color: var(--accent-ink); font-family: var(--display); font-weight: 800;
-  font-size: 22px; padding: 12px 30px; border-radius: 999px; box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 60%, #000) }
-.go:active { transform: translateY(3px); box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 60%, #000) }
-.ghost { border: 2px solid var(--line); background: transparent; border-radius: 999px; padding: 10px 20px; font-weight: 700 }
+.count { font-weight: 700; background: var(--surface); border: var(--b); border-radius: 999px; padding: 6px 14px; box-shadow: 3px 3px 0 var(--shade) }
+.go { border: var(--b); background: var(--accent); color: var(--on-color); font-family: var(--display); font-weight: 800;
+  font-size: 22px; padding: 12px 30px; border-radius: 14px; box-shadow: var(--s) }
+.go:hover { background: var(--orange) }
+.ghost { border: var(--b); background: var(--surface); border-radius: 14px; padding: 10px 20px; font-weight: 700; box-shadow: 4px 4px 0 var(--shade) }
 
 /* skrin mula */
-.hero { display: flex; flex-direction: column; gap: 16px; padding: 24px; background: var(--surface); border-radius: 26px; border: 3px solid var(--line) }
-.hero .big { font-size: 64px; line-height: 1 }
-.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
-@media (max-width: 560px) { .steps { grid-template-columns: 1fr } }
-.steps div { background: var(--tile); border-radius: 16px; padding: 12px; display: flex; gap: 10px; align-items: center; font-weight: 700 }
-.steps span { font-size: 30px }
+.hero { position: relative; display: flex; flex-direction: column; gap: 18px; padding: 28px 24px 24px; background: var(--surface);
+  border-radius: 24px; border: var(--b); box-shadow: var(--s-big); animation: popin .5s var(--bounce) both }
+.hero .big { font-size: 72px; line-height: 1; width: fit-content; animation: float 3s ease-in-out infinite; transform-origin: 50% 90% }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(-6deg) } 50% { transform: translateY(-12px) rotate(6deg) } }
+.hero > p { font-size: 18px; max-width: 46ch }
+.sticker { position: absolute; top: 18px; right: 18px; font-family: var(--display); font-weight: 800; font-size: 15px; line-height: 1.1;
+  text-align: center; color: var(--on-color); background: var(--green); border: var(--b); border-radius: 50%;
+  width: 92px; height: 92px; display: grid; place-items: center; padding: 8px; box-shadow: 4px 4px 0 var(--shade);
+  animation: spin 14s linear infinite }
+@keyframes spin { to { transform: rotate(360deg) } }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 560px) { .steps { grid-template-columns: 1fr } .sticker { width: 76px; height: 76px; font-size: 13px } }
+.steps div { border: var(--b); border-radius: 14px; padding: 12px; display: flex; gap: 10px; align-items: center; font-weight: 700;
+  color: var(--on-color); box-shadow: 4px 4px 0 var(--shade); animation: popin .45s var(--bounce) both }
+.steps div:nth-child(1) { background: var(--pink); transform: rotate(-1.5deg); animation-delay: .15s }
+.steps div:nth-child(2) { background: var(--blue); transform: rotate(1deg); animation-delay: .25s }
+.steps div:nth-child(3) { background: var(--purple); transform: rotate(-1deg); animation-delay: .35s }
+.steps span { font-size: 30px; display: inline-block; animation: bob 2s ease-in-out infinite }
+.steps div:nth-child(2) span { animation-delay: .3s }
+.steps div:nth-child(3) span { animation-delay: .6s }
 .who { display: flex; flex-direction: column; gap: 6px }
 .who label { font-weight: 700 }
-.who input { font: inherit; color: var(--ink); background: var(--bg); border: 3px solid var(--line); border-radius: 14px;
-  padding: 10px 14px; width: 100%; max-width: 420px }
-.who input:focus { outline: none; border-color: var(--accent) }
+.who input { font: inherit; color: var(--ink); background: var(--tile); border: var(--b); border-radius: 12px;
+  padding: 10px 14px; width: 100%; max-width: 420px; box-shadow: 3px 3px 0 var(--shade); transition: box-shadow .12s, transform .12s }
+.who input:focus { outline: none; transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--pink), 5px 5px 0 3px var(--shade) }
 .who .bar { margin-top: 10px }
-.err { color: var(--R); font-weight: 700 }
+.err { color: var(--on-color); background: var(--R); border: 2px solid var(--edge); border-radius: 10px; padding: 4px 10px;
+  width: fit-content; font-weight: 700; animation: shake .4s ease }
+@keyframes shake { 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
 .note { font-size: 14px; color: var(--muted); max-width: 65ch }
 
 /* kad keputusan (untuk tangkap layar) */
-.scorecard { background: var(--surface); border: 3px solid var(--ink); border-radius: 24px; padding: 18px;
-  display: flex; flex-direction: column; gap: 14px }
-.sc-name { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; padding-bottom: 12px; border-bottom: 2px dashed var(--line) }
-.sc-name b { font-family: var(--display); font-size: 24px; line-height: 1.1; min-width: 0; overflow-wrap: anywhere }
-.sc-name span { background: var(--tile); border-radius: 999px; padding: 2px 12px; font-weight: 700; font-size: 15px }
+.scorecard { position: relative; background: var(--surface); border: var(--b); border-radius: 22px; padding: 20px;
+  display: flex; flex-direction: column; gap: 16px; box-shadow: var(--s-big); animation: popin .5s var(--bounce) both }
+.sc-name { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding-bottom: 14px; border-bottom: 3px dashed var(--edge) }
+.sc-name b { font-family: var(--display); font-size: 28px; line-height: 1.1; min-width: 0; overflow-wrap: anywhere }
+.sc-name span { background: var(--accent); color: var(--on-color); border: 2px solid var(--edge); border-radius: 999px; padding: 2px 12px; font-weight: 700; font-size: 15px }
 .sc-top { display: flex; gap: 18px; justify-content: space-between; align-items: flex-end; flex-wrap: wrap }
-.codebox { display: flex; gap: 8px; margin-top: 6px }
-.letter { width: 68px; height: 80px; border-radius: 16px; display: grid; place-items: center; color: #fff;
-  font-family: var(--display); font-weight: 800; font-size: 48px; animation: drop .5s cubic-bezier(.5, 1.6, .5, 1) both }
-.letter:nth-child(2) { animation-delay: .15s }
-.letter:nth-child(3) { animation-delay: .3s }
-@keyframes drop { from { transform: translateY(-30px) scale(.6); opacity: 0 } }
+.codebox { display: flex; gap: 10px; margin-top: 4px }
+.letter { width: 72px; height: 84px; border-radius: 14px; display: grid; place-items: center; color: var(--on-color);
+  border: var(--b); box-shadow: var(--s); font-family: var(--display); font-weight: 800; font-size: 52px;
+  animation: drop .6s var(--bounce) both, bob 2.4s ease-in-out 1s infinite }
+.letter:nth-child(2) { animation-delay: .15s, 1.2s }
+.letter:nth-child(3) { animation-delay: .3s, 1.4s }
+@keyframes drop { from { transform: translateY(-50px) scale(.4) rotate(-20deg); opacity: 0 } }
 .facts { margin: 0; display: flex; gap: 18px }
 .facts dt { font-size: 13px; color: var(--muted); font-weight: 700 }
-.facts dd { margin: 0; font-family: var(--display); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums }
+.facts dd { margin: 0; font-family: var(--display); font-weight: 800; font-size: 28px; font-variant-numeric: tabular-nums }
 .facts small { font-family: var(--body); font-size: 13px; font-weight: 700; color: var(--muted) }
-.tie { background: var(--warn-soft); border-radius: 12px; padding: 10px 12px; font-weight: 700 }
+.tie { background: var(--warn-soft); border: var(--b); border-radius: 12px; padding: 10px 12px; font-weight: 700 }
 .shot, .send { text-align: center; font-weight: 700; color: var(--muted) }
-.send.ok { color: var(--picked) }
-.send.fail { color: var(--ink); background: var(--warn-soft); border-radius: 12px; padding: 10px 12px }
-.ghost.small { padding: 4px 14px; margin-left: 6px; border-color: var(--ink) }
-.bars { display: flex; flex-direction: column; gap: 8px }
-.brow { display: grid; grid-template-columns: 140px minmax(0, 1fr) 48px; gap: 10px; align-items: center }
+.send.ok { color: var(--on-color); background: var(--green); border: var(--b); border-radius: 12px; padding: 8px 12px }
+.send.fail { color: var(--ink); background: var(--warn-soft); border: var(--b); border-radius: 12px; padding: 10px 12px }
+.ghost.small { padding: 4px 14px; margin-left: 6px; box-shadow: 3px 3px 0 var(--shade) }
+.bars { display: flex; flex-direction: column; gap: 10px }
+.brow { display: grid; grid-template-columns: 140px minmax(0, 1fr) 48px; gap: 10px; align-items: center; font-weight: 700 }
 @media (max-width: 420px) { .brow { grid-template-columns: 110px minmax(0, 1fr) 44px; font-size: 15px } }
-.brow .track { height: 18px; border-radius: 9px; background: var(--line); overflow: hidden }
-.brow .val { height: 100%; border-radius: 9px; transition: width .8s ease }
+.brow .track { height: 22px; border-radius: 8px; background: var(--tile); border: var(--b); overflow: hidden }
+.brow .val { height: 100%; border-right: var(--b); animation: grow 1s var(--bounce) .4s both; transform-origin: left }
+.brow .val[style*="width:0%"] { border-right: 0 }
+@keyframes grow { from { transform: scaleX(0) } }
 .brow b { font-variant-numeric: tabular-nums; text-align: right }
-.types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+.types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px }
 @media (max-width: 560px) { .types { grid-template-columns: 1fr } }
-.type { background: var(--surface); border-radius: 18px; padding: 14px; border-top: 6px solid; display: flex; flex-direction: column; gap: 6px }
+.type { background: var(--surface); border-radius: 16px; padding: 14px; border: var(--b); border-top-width: 12px; box-shadow: var(--s);
+  display: flex; flex-direction: column; gap: 8px; animation: popin .5s var(--bounce) both }
+.type:nth-child(2) { animation-delay: .1s }
+.type:nth-child(3) { animation-delay: .2s }
 .type h3 { font-size: 22px }
 .chips { display: flex; flex-wrap: wrap; gap: 6px }
-.chips span { background: var(--tile); border-radius: 999px; padding: 3px 10px; font-size: 14px }
-.panel { background: var(--surface); border-radius: 22px; padding: 18px; border: 3px solid var(--line) }
+.chips span { background: var(--tile); border: 2px solid var(--edge); border-radius: 999px; padding: 2px 10px; font-size: 14px; font-weight: 700 }
+.panel { background: var(--surface); border-radius: 20px; padding: 18px; border: var(--b); box-shadow: var(--s) }
 
-@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important } }
+/* konfeti bila misi selesai */
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 5 }
+.confetti i { position: absolute; top: -20px; width: 12px; height: 16px; border: 2px solid var(--shade); border-radius: 3px;
+  animation: fall 2.6s cubic-bezier(.3, .6, .5, 1) forwards }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: .9 } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before { animation: none !important; transition: none !important }
+  .confetti { display: none }
+}

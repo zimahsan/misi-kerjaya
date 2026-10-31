@@ -43,7 +43,7 @@ const STAGES = SECTIONS.map(sec => {
     const k = TYPE_ORDER[Math.floor((no - sec.from) / sec.perType)];
     const s = (typeof AYAT !== "undefined" && AYAT[no]) || "";
     const t = LABEL[no] || "";
-    if (s || t) items.push({ no, k, s, t, e: PIC[no] || PIC_DEFAULT[k] });
+    if (s || t) items.push({ no, k, s, t, e: GAMBAR[no] || PIC[no] || PIC_DEFAULT[k] });
   }
   return { eyebrow: sec.eyebrow, title: sec.title, say: sec.say, items };
 });

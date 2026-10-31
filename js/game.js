@@ -125,7 +125,8 @@ function intro() {
   app.innerHTML = `
     <div class="hero">
       <div class="big" aria-hidden="true">🧑‍🚀</div>
-      <h1>Misi Kerjaya</h1>
+      <div class="sticker" aria-hidden="true">Tiada jawapan salah!</div>
+      <h1>Misi <mark>Kerjaya</mark></h1>
       <p>Tekan gambar yang kamu suka. Tak perlu banyak membaca. Tiada jawapan betul atau salah.</p>
       <div class="steps">
         <div><span aria-hidden="true">❤️</span>1. Apa kamu suka</div>
@@ -154,9 +155,9 @@ function stage(i) {
   const st = STAGES[i], picks = state.picks[i], pages = state.pages[i];
   const last = state.page >= pages.length - 1;
   const pageNote = pages.length > 1 ? ` · Halaman ${state.page + 1}/${pages.length}` : "";
-  const cards = pages[state.page].map(j => {
+  const cards = pages[state.page].map((j, n) => {
     const it = st.items[j], on = picks.includes(j), text = it.s || it.t;
-    return `<div class="cardwrap">
+    return `<div class="cardwrap" style="--i:${n}">
       <button class="card" data-pick="${j}" aria-pressed="${on}">
         <span class="tick" aria-hidden="true">✓</span>
         <span class="pic" aria-hidden="true">${it.e}</span>
@@ -195,8 +196,8 @@ function result() {
   const bars = KEYS.map(k => `<div class="brow"><span>${k} · ${TYPES[k].n}</span>
       <div class="track"><div class="val" style="width:${max[k] ? s[k] / max[k] * 100 : 0}%;background:var(--${k})"></div></div>
       <b>${s[k]}/${max[k]}</b></div>`).join("");
-  const typeCards = code.map(k => `<div class="type" style="border-color:var(--${k})">
-      <h3 style="color:var(--${k})">${k} · ${TYPES[k].n}</h3><p>${TYPES[k].d}</p>
+  const typeCards = code.map(k => `<div class="type" style="border-top-color:var(--${k})">
+      <h3>${k} · ${TYPES[k].n}</h3><p>${TYPES[k].d}</p>
       <div class="chips">${TYPES[k].jobs.map(j => `<span>${j}</span>`).join("")}</div></div>`).join("");
 
   app.innerHTML = `${pathHTML()}
@@ -223,6 +224,7 @@ function result() {
     </section>
     <div class="types">${typeCards}</div>`}
     ${TOTAL_ITEMS < 192 ? `<p class="note">Demo ${TOTAL_ITEMS} item tidak boleh dijadikan keputusan sebenar. Dalam SDS penuh, skor maksimum ialah 32 setiap jenis dan Indeks Pembezaan melebihi 16 dikira tinggi.</p>` : ""}
+    ${none ? "" : confettiHTML()}
     <div class="bar"><span></span><button class="ghost" data-restart>↺ Main semula</button></div>`;
 
   if (!none && !state.payload) {
@@ -234,6 +236,13 @@ function result() {
     };
   }
   sendResult();
+}
+
+// Konfeti sekali sahaja bila keputusan dipaparkan
+function confettiHTML() {
+  const warna = ["var(--R)", "var(--I)", "var(--A)", "var(--S)", "var(--E)", "var(--C)"];
+  return `<div class="confetti" aria-hidden="true">${Array.from({ length: 36 }, (_, i) =>
+    `<i style="left:${Math.random() * 100}%;background:${warna[i % 6]};animation-delay:${(Math.random() * .8).toFixed(2)}s;animation-duration:${(2 + Math.random() * 1.5).toFixed(2)}s"></i>`).join("")}</div>`;
 }
 
 function render() {
